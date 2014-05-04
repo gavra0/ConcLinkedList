@@ -1,0 +1,130 @@
+################
+# Local settings
+################
+
+# Compiler
+CC ?= gcc
+
+# Profile
+ifeq ($(VERSION),DEBUG)
+     CFLAGS	+= -g -DDEBUG -O0
+else
+     CFLAGS	+= -O3 -DNDEBUG 
+endif
+
+CFLAGS += -D_GNU_SOURCE
+
+ROOT 		?= ../..
+BINDIR		?= $(ROOT)/bin
+BUILDIR		?= $(ROOT)/build
+
+$(shell [ -d "$(BUILDIR)" ] || mkdir -p $(BUILDIR))
+$(shell [ -d "$(BINDIR)" ] || mkdir -p $(BINDIR))
+
+ifndef STM
+  LOCK          ?= MUTEX
+endif
+ifeq ($(STM),LOCKFREE)
+  CFLAGS	+= -DLOCKFREE
+endif
+
+#############################
+# Platform dependent settings
+#############################
+#
+# GCC thread-local storage requires "significant 
+# support from the linker (ld), dynamic linker
+# (ld.so), and system libraries (libc.so and libpthread.so), so it is
+# not available everywhere." source: GCC-doc.
+#
+# pthread_spinlock is replaced by pthread_mutex 
+# on MacOS X, as it might not be supported. 
+# Comment LOCK = MUTEX below to enable.
+
+ifndef OS_NAME
+    OS_NAME = $(shell uname -s)
+endif
+
+ifeq ($(OS_NAME), Linux)
+    OS = Linux
+    DEFINES += -DTLS
+endif
+
+ifneq ($(STM), LOCKFREE) 
+    CFLAGS += -D$(LOCK)
+endif
+
+#################################
+# Management PC specific settings
+#################################
+
+ifndef PC_NAME
+	PC_NAME = $(shell uname -n)
+endif
+
+PLATFORM_SET = 0
+ifeq ($(PC_NAME), lpd48core)
+    PLATFORM_SET = 1
+    CFLAGS += -DOPTERON -DPLATFORM_MCORE -DOPTERON_OPTIMIZE
+    PLATFORM_NUMA = 1
+endif
+
+ifeq ($(PLATFORM_SET), 0)
+CORE_NUM := $(shell nproc)
+ifneq ($(CORE_SPEED_KHz), )
+CFLAGS += -DCORE_NUM=${CORE_NUM} -DDEFAULT
+else
+CFLAGS += -DCORE_NUM=4  -DDEFAULT
+endif
+$(info ********************************** Using as a default number of cores: $(CORE_NUM) on 1 socket)
+$(info ********************************** Is this correct? If not, fix it in utils.h)
+endif
+
+
+#################################
+# Architecture dependent settings
+#################################
+
+ifndef ARCH
+    ARCH_NAME = $(shell uname -m)
+endif
+
+ifeq ($(ARCH_NAME), i386)
+    ARCH = x86
+    CFLAGS += -m32
+    LDFLAGS += -m32
+endif
+
+ifeq ($(ARCH_NAME), i686)
+    ARCH = x86
+    CFLAGS += -m32
+    LDFLAGS += -m32
+endif
+
+ifeq ($(ARCH_NAME), x86_64)
+    ARCH = x86_64
+    CFLAGS += -m64
+    LDFLAGS += -m64
+endif
+
+ifeq ($(ARCH_NAME), sun4v)
+    ARCH = sparc64
+    CFLAGS += -DSPARC=1 -DINLINED=1 -m64
+    LDFLAGS += -lrt -m64
+endif
+
+ifeq ($(PLATFORM_NUMA), 1)
+    LDFLAGS += -lnuma
+endif
+
+
+#################
+# Global settings
+#################
+
+CFLAGS += -D_REENTRANT
+CFLAGS += -Wall
+CFLAGS += -fno-strict-aliasing
+CFLAGS += -I$(ROOT)/include
+
+LDFLAGS += -lpthread -lrt -lm
