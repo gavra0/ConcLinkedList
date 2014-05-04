@@ -27,13 +27,6 @@ Lock-free linkedlist implementation of Harris' algorithm
 T. Harris, p. 300-314, DISC 2001.
 
 
-DEADLINE
---------
-
-You should provide us with the deliverables (see below) until Monday, December 16th, 23:59.
-The deadline is strict: late solutions will NOT be considered.
-
-
 INSTALL
 -------
 
@@ -122,60 +115,7 @@ When using locks, memory management is rather straightforward, because of the mu
 property of locks. You can optionally implement memory management on the lock-based version.
 
 
-DELIVERABLES
-------------
-
-You will provide us with:
-* a zip archive of your code, named ca13_lists_Surname.zip, e.g., ca13_lists_Trigonakis.zip
-* a short pdf report, named ca13_lists_Surname.pdf with:
-  (1) a description of your implementations
-  (2) the details of the hardware platform you used for the evaluation
-  (3) evaluation (graphs and explanation) for the following workloads (it is recommended to
-      use the scripts in the scripts folder to perform your evaluation)
-      	  (a) Initial size: 128, range 256, update rates: 0, 10, 50 %, #threads: 1, 2,.., max
-	  (b) Initial size: 1024, range 2048, update rates: 0, 10, 50 % #threads: 1, 2,..., max
-      	  (c) Initial size: 8192, range 16384, update rates: 0, 10, 50 %, #threads: 1, 2,..., max
-
-where "max" is the number of cores (or hardware threads) of your target processor. 
-You should use a test duration that is greater (equal) to 2000ms.
-
 An "easy" way to get the necessary results is to execute the experiments using:
    ./scripts/run_ll.sh
 and then plots the grapsh using:
    ./scripts/create_plots_ll.sh
-
-You will email us your solutions to both: vasileios.trigonakis@epfl.ch and tudor.david@epfl.ch
-with a title: [CA13] Programming assignment
-
-
-GRADING
--------
-
-The points of this programming assignment are bonus, i.e., you can still get a 6 in the 
-final exam, even if you do not get any points from this assignment. You can get up to 
-1.5 bonus points from this assignment.
-
-We will compile and execute your code on a 48-core AMD Opteron processor with
-Ubuntu 12.04 Linux. The fastest implementation, for any of the two versions of 
-the list, will grand you an extra 0.5 points. If the same student gets the fastest
-implementations for both versions, then the second fastest implementation of the 
-lock-based list will be granted with the 0.5 bonus.
-
-Breakdown of points:
-	  * lock-free implementation: 0.5 points
-	  * lock-based implementation: 0.5 points
-	  * fastest implementation: 0.5 points
-
-
-COPYING
--------
-     
-There are many more resources out there. However, there is no tolerance for academic dishonesty. 
-Please refer to the University Policy on cheating and plagiarism. Discussion and group studies
- are encouraged. However, all submitted material must be the student's individual work. 
-
-Example behavior that is considered academic dishonesty: 
-	* Writing code together 
-	* Copying code from any online resources or previous solutions. 
-
-You can talk to the professor or TAs for clarification if you have any questions.
